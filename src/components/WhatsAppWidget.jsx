@@ -76,7 +76,7 @@ export default function WhatsAppWidget({ simulacion }) {
   const hayPendientes = CONTACTOS.some((c) => esPendiente(c.whatsapp))
 
   return (
-    <div className="fixed bottom-5 right-5 z-[60] flex flex-col items-end gap-3 md:bottom-7 md:right-7">
+    <div className="widget-wa fixed bottom-5 right-5 z-[60] flex flex-col items-end gap-3 md:bottom-7 md:right-7">
       {/* ------------------------------ PANEL ------------------------------ */}
       <AnimatePresence>
         {abierto && (

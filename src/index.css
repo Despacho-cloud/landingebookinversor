@@ -81,6 +81,16 @@
     font-variant-numeric: tabular-nums;
     font-feature-settings: 'tnum' 1;
   }
+
+  /* El botón flotante de WhatsApp se aparta mientras el menú móvil está abierto */
+  body[data-menu-abierto] .widget-wa {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .widget-wa {
+    transition: opacity 0.2s ease;
+  }
 }
 
 /* ------------------------------------------------------------------

@@ -17,11 +17,17 @@ export default function Nav() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Bloquea el scroll del body mientras el menú móvil está abierto.
+  /* Con el menú móvil abierto: se bloquea el scroll del body y se marca el
+     estado en el <body>, para que el botón flotante de WhatsApp no quede
+     encima del menú. */
   useEffect(() => {
     document.body.style.overflow = abierto ? 'hidden' : ''
+    if (abierto) document.body.dataset.menuAbierto = 'true'
+    else delete document.body.dataset.menuAbierto
+
     return () => {
       document.body.style.overflow = ''
+      delete document.body.dataset.menuAbierto
     }
   }, [abierto])
 
