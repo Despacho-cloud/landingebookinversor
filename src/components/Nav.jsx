@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { NAV } from '../data/content'
 import { useActiveSection } from '../hooks/useActiveSection'
@@ -178,14 +178,32 @@ export default function Nav({ onParticipar }) {
 }
 
 function ProgresoScroll() {
-  const [progreso, setProgreso] = useState(0)
+  const barraRef = useRef(null)
 
+  /* Se escribe directo en el DOM dentro de un rAF, sin estado de React: antes
+     esto disparaba un re-render por cada evento de scroll, que es lo que más
+     encarecía el desplazamiento en móvil. También se anima `scaleX` en vez de
+     `width`, que es una propiedad que la GPU compone sin volver a maquetar. */
   useEffect(() => {
-    const onScroll = () => {
-      const alto = document.body.scrollHeight - window.innerHeight
-      setProgreso(alto > 0 ? window.scrollY / alto : 0)
+    const barra = barraRef.current
+    if (!barra) return
+
+    let pendiente = false
+
+    const pintar = () => {
+      pendiente = false
+      const alto = document.documentElement.scrollHeight - window.innerHeight
+      const p = alto > 0 ? Math.min(window.scrollY / alto, 1) : 0
+      barra.style.transform = `scaleX(${p})`
     }
-    onScroll()
+
+    const onScroll = () => {
+      if (pendiente) return
+      pendiente = true
+      requestAnimationFrame(pintar)
+    }
+
+    pintar()
     window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('resize', onScroll)
     return () => {
@@ -197,8 +215,9 @@ function ProgresoScroll() {
   return (
     <div className="absolute inset-x-0 bottom-0 h-px bg-white/5">
       <div
-        className="h-full bg-gold transition-[width] duration-150 ease-out"
-        style={{ width: `${progreso * 100}%` }}
+        ref={barraRef}
+        className="h-full origin-left bg-gold"
+        style={{ transform: 'scaleX(0)', willChange: 'transform' }}
       />
     </div>
   )

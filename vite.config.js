@@ -9,6 +9,17 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   build: {
     outDir: 'dist',
-    assetsInlineLimit: 0,
+    assetsInlineLimit: 4096, // los archivos diminutos viajan dentro del CSS/JS
+    rollupOptions: {
+      output: {
+        /* React y framer-motion cambian poco: en su propio archivo, el
+           navegador los reutiliza de la caché entre despliegues y solo
+           vuelve a bajar el código del sitio. */
+        manualChunks: {
+          react: ['react', 'react-dom'],
+          animacion: ['framer-motion'],
+        },
+      },
+    },
   },
 })

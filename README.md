@@ -226,6 +226,37 @@ scripts/
 - El estado vive en `App.jsx`, para que los botones «Simular este plan» de la sección
   de planes puedan precargar un monto y llevar al usuario a la calculadora.
 
+## Rendimiento — decisiones que no hay que deshacer
+
+El sitio arrancó lento y se corrigió midiendo. Cuatro cosas conviene no revertir:
+
+**1. Las fuentes se auto-alojan.** Estaban en `fonts.googleapis.com`, y esa hoja de
+estilos *bloquea el render*: el navegador no pintaba nada hasta resolver DNS, TLS y
+descarga de un tercero. El primer pintado tardaba 2.9 s. Ahora viajan con el sitio,
+como archivos variables (un woff2 por familia cubre los pesos 400–700). Si alguien
+vuelve a pegar el `<link>` de Google Fonts en `index.html`, se pierde la mejora.
+
+**2. El fondo del hero no lleva `filter: blur()`.** Eran tres círculos de ~880 px con
+`blur(120px)` animados con `scale`, cada uno con `will-change`. El navegador tenía que
+volver a rasterizar tres capas enormes en cada frame — lo más caro de la página en un
+teléfono. Un `radial-gradient` ya es suave, así que el desenfoque sobraba.
+
+**3. Nada escribe estado de React en cada evento de scroll.** La barra de progreso se
+pinta directo en el DOM dentro de un `requestAnimationFrame`, y `useActiveSection`
+compara `scrollY` contra posiciones medidas una vez, en vez de llamar a
+`getBoundingClientRect()` por sección en cada frame.
+
+**4. Las imágenes están dimensionadas para su tamaño real de presentación** y llevan
+`width`/`height` para que la página no salte al cargarlas.
+
+Resultado medido en el build de producción:
+
+| | Antes | Después |
+|---|---|---|
+| Peticiones a terceros | 3 | 0 |
+| Peso total | ~490 KB | ~256 KB |
+| Scroll, primera pasada | 50 fps · 23 frames largos | 59 fps · 2 frames largos |
+
 ## Stack
 
 React 18 + Vite 6 + Tailwind CSS 4 + Framer Motion. Sin backend, sin dependencias

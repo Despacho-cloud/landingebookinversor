@@ -3,10 +3,12 @@ import logoEb2 from '../assets/brand/logo_eb2life.webp'
 import logoAls from '../assets/brand/logo_als.webp'
 import Reveal from './Reveal'
 
+/* Las medidas intrínsecas evitan que la página salte cuando cargan las
+   imágenes: el navegador reserva el hueco desde el primer render. */
 export const MARCAS = [
-  { src: logoHanei, alt: 'HAN’EI Academy' },
-  { src: logoEb2, alt: 'Eb2.life — everything you need' },
-  { src: logoAls, alt: 'ALS — The American Legal Strategy' },
+  { src: logoHanei, alt: 'HAN’EI Academy', w: 320, h: 339 },
+  { src: logoEb2, alt: 'Eb2.life — everything you need', w: 300, h: 300 },
+  { src: logoAls, alt: 'ALS — The American Legal Strategy', w: 320, h: 326 },
 ]
 
 /**
@@ -30,6 +32,8 @@ export default function BrandBar({ variant = 'hero' }) {
             <img
               src={m.src}
               alt={m.alt}
+              width={m.w}
+              height={m.h}
               loading="lazy"
               decoding="async"
               className="max-h-full max-w-full object-contain"
@@ -53,6 +57,8 @@ export default function BrandBar({ variant = 'hero' }) {
                 key={m.alt}
                 src={m.src}
                 alt={m.alt}
+                width={m.w}
+                height={m.h}
                 loading="lazy"
                 decoding="async"
                 /* El escudo de HAN’EI es blanco: la sombra lo separa del fondo claro. */

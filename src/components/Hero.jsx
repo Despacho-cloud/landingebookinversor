@@ -118,33 +118,37 @@ function Chip({ chip, index, visible }) {
   )
 }
 
-/** Gradiente animado + retícula sutil. Sin video ni imágenes pesadas. */
+/**
+ * Fondo del hero: gradientes suaves + retícula fina.
+ *
+ * Antes eran tres círculos de ~880 px con filter: blur(120px) animados con
+ * scale, cada uno con will-change. Eso obliga al navegador a volver a
+ * rasterizar tres capas enormes y desenfocadas en cada frame — lo más caro de
+ * toda la página en un teléfono. Un radial-gradient ya es suave por
+ * definición, así que el desenfoque sobraba: mismo aspecto, sin filtro, sin
+ * capas extra y sin trabajo por frame.
+ */
 function FondoHero() {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-      <div className="absolute inset-0 bg-navy-deep" />
+      <div
+        className="absolute inset-0 bg-navy-deep"
+        style={{
+          backgroundImage: [
+            'radial-gradient(60rem 45rem at 8% -10%, rgba(30,48,97,0.85) 0%, rgba(21,35,75,0) 65%)',
+            'radial-gradient(45rem 40rem at 95% 12%, rgba(201,162,39,0.16) 0%, rgba(201,162,39,0) 62%)',
+            'radial-gradient(42rem 38rem at 38% 108%, rgba(30,48,97,0.7) 0%, rgba(21,35,75,0) 66%)',
+          ].join(','),
+        }}
+      />
 
+      {/* Único elemento animado: solo opacidad, que la GPU compone sin
+          volver a rasterizar nada. */}
       <div
-        className="aurora absolute -left-[15%] -top-[25%] h-[55rem] w-[55rem] rounded-full blur-[120px]"
+        className="respiro absolute inset-0"
         style={{
-          background:
-            'radial-gradient(circle, rgba(30,48,97,0.9) 0%, rgba(21,35,75,0) 70%)',
-        }}
-      />
-      <div
-        className="aurora absolute -right-[20%] top-[5%] h-[45rem] w-[45rem] rounded-full blur-[130px]"
-        style={{
-          background:
-            'radial-gradient(circle, rgba(201,162,39,0.18) 0%, rgba(201,162,39,0) 70%)',
-          animationDelay: '-7s',
-        }}
-      />
-      <div
-        className="aurora absolute -bottom-[30%] left-[25%] h-[40rem] w-[40rem] rounded-full blur-[120px]"
-        style={{
-          background:
-            'radial-gradient(circle, rgba(30,48,97,0.7) 0%, rgba(21,35,75,0) 70%)',
-          animationDelay: '-12s',
+          backgroundImage:
+            'radial-gradient(38rem 32rem at 78% 20%, rgba(201,162,39,0.13) 0%, rgba(201,162,39,0) 60%)',
         }}
       />
 

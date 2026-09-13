@@ -8,9 +8,9 @@ import logoEb2 from '../assets/brand/logo_eb2life.webp'
 import logoAls from '../assets/brand/logo_als.webp'
 
 const SELLOS = [
-  { src: logoHanei, alt: 'HAN’EI Academy' },
-  { src: logoEb2, alt: 'Eb2.life' },
-  { src: logoAls, alt: 'ALS — The American Legal Strategy' },
+  { src: logoHanei, alt: 'HAN’EI Academy', w: 320, h: 339 },
+  { src: logoEb2, alt: 'Eb2.life', w: 300, h: 300 },
+  { src: logoAls, alt: 'ALS — The American Legal Strategy', w: 320, h: 326 },
 ]
 
 export default function Founder() {
@@ -27,6 +27,8 @@ export default function Founder() {
               <img
                 src={foto}
                 alt="Dr. Benjamín Fiallos J., CEO de HAN’EI USA LLC"
+                width={300}
+                height={300}
                 loading="lazy"
                 decoding="async"
                 className="aspect-square w-full object-cover object-center"
@@ -44,6 +46,8 @@ export default function Founder() {
                   key={s.alt}
                   src={s.src}
                   alt={s.alt}
+                  width={s.w}
+                  height={s.h}
                   loading="lazy"
                   decoding="async"
                   className="h-12 w-auto object-contain"
@@ -81,6 +85,8 @@ export default function Founder() {
               <img
                 src={firma}
                 alt={`Firma de ${RESPALDO.nombre} — ${RESPALDO.cargo}`}
+                width={900}
+                height={531}
                 loading="lazy"
                 decoding="async"
                 className="h-28 w-auto object-contain object-left md:h-32"
