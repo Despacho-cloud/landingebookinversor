@@ -5,13 +5,14 @@ import {
   CONTACTOS,
   EMAIL_CONTACTO,
   PARTICIPAR,
+  PARTICIPAR_MODAL,
   RONDA,
   mailLink,
   waLink,
 } from '../data/content'
 import { money } from '../lib/finance'
 
-export default function CTA({ simulacion }) {
+export default function CTA({ simulacion, onParticipar }) {
   return (
     <Section id="participar" tone="light">
       <SectionHead
@@ -100,10 +101,27 @@ export default function CTA({ simulacion }) {
                 Contacto directo
               </p>
               <p className="mt-2 text-xs leading-relaxed text-white/50">
-                Escribe a quien prefieras. Los dos llevan la ronda.
+                Arma tu participación o escribe directo. Los dos llevan la ronda.
               </p>
 
-              <div className="mt-6 space-y-3">
+              <button
+                type="button"
+                onClick={onParticipar}
+                className="group mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-gold px-5 py-4 text-sm font-semibold text-navy-deep transition-all hover:brightness-110 hover:shadow-[0_14px_36px_-12px_rgba(201,162,39,0.9)]"
+              >
+                {PARTICIPAR_MODAL.cta}
+                <span className="transition-transform duration-300 group-hover:translate-x-1">
+                  →
+                </span>
+              </button>
+
+              <p className="mt-5 flex items-center gap-3 text-[0.7rem] uppercase tracking-[0.14em] text-white/30">
+                <span className="h-px flex-1 bg-white/12" />
+                o escribe directo
+                <span className="h-px flex-1 bg-white/12" />
+              </p>
+
+              <div className="mt-5 space-y-3">
                 {CONTACTOS.map((c) => (
                   <BotonWhatsApp key={c.id} contacto={c} simulacion={simulacion} />
                 ))}
@@ -135,23 +153,20 @@ export default function CTA({ simulacion }) {
 
 function BotonWhatsApp({ contacto, simulacion }) {
   const href = waLink(contacto, { seccion: 'participar', simulacion })
-  const esGold = contacto.acento === 'gold'
 
+  /* Secundarios frente al botón dorado de «Quiero participar»: el color de
+     WhatsApp vive solo en el icono. */
   const interior = (
     <>
-      <WhatsAppIcon className="h-5 w-5 shrink-0" />
+      <WhatsAppIcon className="h-5 w-5 shrink-0 text-[#25D366]" />
       <span className="flex-1 text-left">
         <span className="block">Escribir a {contacto.corto}</span>
-        <span
-          className={`mt-0.5 block text-[0.65rem] font-normal ${
-            esGold ? 'text-navy-deep/65' : 'text-white/60'
-          }`}
-        >
+        <span className="mt-0.5 block text-[0.65rem] font-normal text-white/45">
           {href ? contacto.rol : 'Número pendiente de configurar'}
         </span>
       </span>
       {href && (
-        <span className="shrink-0 transition-transform duration-300 group-hover:translate-x-1">
+        <span className="shrink-0 text-white/30 transition-all duration-300 group-hover:translate-x-1 group-hover:text-gold">
           →
         </span>
       )}
@@ -177,11 +192,7 @@ function BotonWhatsApp({ contacto, simulacion }) {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className={`${base} ${
-        esGold
-          ? 'bg-gold text-navy-deep hover:brightness-110 hover:shadow-[0_14px_36px_-12px_rgba(201,162,39,0.9)]'
-          : 'bg-[#25D366] text-white hover:brightness-110 hover:shadow-[0_14px_36px_-12px_rgba(37,211,102,0.85)]'
-      }`}
+      className={`${base} text-white ring-1 ring-white/15 hover:bg-white/5 hover:ring-white/35`}
     >
       {interior}
     </a>

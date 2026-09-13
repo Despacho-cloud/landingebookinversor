@@ -14,6 +14,7 @@ import RiskSection from './components/RiskSection'
 import CTA from './components/CTA'
 import Footer from './components/Footer'
 import WhatsAppWidget from './components/WhatsAppWidget'
+import ModalParticipar from './components/ModalParticipar'
 import { RONDA } from './data/content'
 import { calcular, money, money2, pct } from './lib/finance'
 
@@ -30,6 +31,11 @@ export default function App() {
        un plan: solo entonces tiene sentido mandar la simulación por WhatsApp. */
     tocada: false,
   })
+
+  /* Flujo «Quiero participar»: se abre desde la nav, el hero y el CTA final. */
+  const [participarAbierto, setParticiparAbierto] = useState(false)
+  const abrirParticipar = useCallback(() => setParticiparAbierto(true), [])
+  const cerrarParticipar = useCallback(() => setParticiparAbierto(false), [])
 
   const simular = useCallback((monto, esOperador = false) => {
     setCalc((s) => ({ ...s, monto, esOperador, tocada: true }))
@@ -58,10 +64,10 @@ export default function App() {
 
   return (
     <>
-      <Nav />
+      <Nav onParticipar={abrirParticipar} />
 
       <main>
-        <Hero />
+        <Hero onParticipar={abrirParticipar} />
         <BrandBar />
         <Opportunity />
         <HowItWorks />
@@ -72,12 +78,19 @@ export default function App() {
         <WinWin />
         <Founder />
         <RiskSection />
-        <CTA simulacion={simulacion} />
+        <CTA simulacion={simulacion} onParticipar={abrirParticipar} />
       </main>
 
       <Footer />
 
-      <WhatsAppWidget simulacion={simulacion} />
+      <WhatsAppWidget simulacion={simulacion} onParticipar={abrirParticipar} />
+
+      <ModalParticipar
+        abierto={participarAbierto}
+        onCerrar={cerrarParticipar}
+        /* Arranca con lo que el visitante ya haya simulado en la calculadora */
+        inicial={calc.tocada ? { monto: calc.monto, modalidad: calc.modalidad } : null}
+      />
     </>
   )
 }

@@ -1,7 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import WhatsAppIcon from './WhatsAppIcon'
-import { CONTACTOS, NAV, WIDGET, esPendiente, waLink } from '../data/content'
+import {
+  CONTACTOS,
+  NAV,
+  PARTICIPAR_MODAL,
+  WIDGET,
+  esPendiente,
+  waLink,
+} from '../data/content'
 import { useActiveSection } from '../hooks/useActiveSection'
 
 const IDS = NAV.map((n) => n.id)
@@ -13,7 +20,7 @@ const IDS = NAV.map((n) => n.id)
  * WhatsApp se arma en el momento del clic: lleva la sección que el visitante
  * está mirando y, si ya tocó la calculadora, su simulación completa.
  */
-export default function WhatsAppWidget({ simulacion }) {
+export default function WhatsAppWidget({ simulacion, onParticipar }) {
   const [abierto, setAbierto] = useState(false)
   const [burbuja, setBurbuja] = useState(false)
   const [burbujaVista, setBurbujaVista] = useState(false)
@@ -96,6 +103,27 @@ export default function WhatsAppWidget({ simulacion }) {
                 {WIDGET.bajada}
               </p>
             </div>
+
+            {onParticipar && (
+              <div className="border-b border-white/10 p-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAbierto(false)
+                    onParticipar()
+                  }}
+                  className="group/cta flex w-full items-center justify-center gap-2 rounded-xl bg-gold px-4 py-3 text-sm font-semibold text-navy-deep transition-all hover:brightness-110"
+                >
+                  {PARTICIPAR_MODAL.cta}
+                  <span className="transition-transform duration-300 group-hover/cta:translate-x-0.5">
+                    →
+                  </span>
+                </button>
+                <p className="mt-2 text-center text-[0.65rem] text-white/35">
+                  Arma tu monto y mándalo listo
+                </p>
+              </div>
+            )}
 
             <div className="p-3">
               {CONTACTOS.map((c, i) => (

@@ -5,7 +5,7 @@ import { useActiveSection } from '../hooks/useActiveSection'
 
 const IDS = NAV.map((n) => n.id)
 
-export default function Nav() {
+export default function Nav({ onParticipar }) {
   const [scrolled, setScrolled] = useState(false)
   const [abierto, setAbierto] = useState(false)
   const activa = useActiveSection(IDS)
@@ -90,13 +90,13 @@ export default function Nav() {
           </nav>
 
           <div className="flex items-center gap-2">
-            <a
-              href="#planes"
-              onClick={irA('planes')}
+            <button
+              type="button"
+              onClick={onParticipar}
               className="hidden whitespace-nowrap rounded-full bg-gold px-5 py-2.5 text-[0.8rem] font-semibold text-navy-deep transition-all hover:brightness-110 hover:shadow-[0_8px_24px_-8px_rgba(201,162,39,0.8)] sm:block"
             >
-              Quiero invertir
-            </a>
+              Quiero participar
+            </button>
 
             <button
               type="button"
@@ -159,13 +159,16 @@ export default function Nav() {
                   </span>
                 </motion.a>
               ))}
-              <a
-                href="#participar"
-                onClick={irA('participar')}
+              <button
+                type="button"
+                onClick={() => {
+                  setAbierto(false)
+                  onParticipar()
+                }}
                 className="mt-6 rounded-full bg-gold px-6 py-4 text-center font-semibold text-navy-deep"
               >
-                Quiero invertir
-              </a>
+                Quiero participar
+              </button>
             </nav>
           </motion.div>
         )}

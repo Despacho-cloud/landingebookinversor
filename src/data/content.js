@@ -10,15 +10,13 @@
  * ⚙️  DATOS DE CONTACTO — EDITAR AQUÍ (ÚNICO LUGAR DEL SITIO)
  * ═══════════════════════════════════════════════════════════════════════════
  *
- * ⚠️  PENDIENTE: los tres valores marcados con «REEMPLAZAR» son marcadores de
- *     posición. Mientras digan eso, el botón flotante muestra un aviso y no
- *     abre WhatsApp, para que nadie caiga en un número inexistente.
+ * Formato del WhatsApp: internacional, SOLO dígitos, sin +, sin espacios y sin
+ * guiones.  Ecuador: 593 + número sin el 0 inicial.
+ *   +593 99 252 6667  →  '593992526667'
+ *   (305) 555-1234    →  '13055551234'
  *
- *     · whatsapp → formato internacional, SOLO dígitos, sin +, sin espacios
- *       y sin guiones.  Ecuador: 593 + número sin el 0 inicial.
- *       Ej.: 0991234567  →  '593991234567'
- *       EE. UU.: 1 + número.  Ej.: (305) 555-1234 → '13055551234'
- *     · email → el correo que recibe las solicitudes.
+ * Si algún valor se deja vacío o empezando por «REEMPLAZAR», el sitio no genera
+ * el enlace: el botón queda desactivado en vez de llevar a un chat inexistente.
  * ------------------------------------------------------------------------ */
 
 export const CONTACTOS = [
@@ -27,8 +25,7 @@ export const CONTACTOS = [
     nombre: 'Dr. Benjamín Fiallos J.',
     corto: 'Benjamín',
     rol: 'CEO · HAN’EI USA LLC',
-    /* 👇 REEMPLAZAR con el WhatsApp de Benjamín */
-    whatsapp: 'REEMPLAZAR_WHATSAPP_BENJAMIN',
+    whatsapp: '593992526667', // +593 99 252 6667
     /* Para qué escribirle: define el ángulo del mensaje precargado */
     para: 'Condiciones del acuerdo, uso del capital y reglas de salida.',
     acento: 'gold',
@@ -38,15 +35,13 @@ export const CONTACTOS = [
     nombre: 'Isaac Almeida',
     corto: 'Isaac',
     rol: 'Proyecto Starter Kits',
-    /* 👇 REEMPLAZAR con el WhatsApp de Isaac */
-    whatsapp: 'REEMPLAZAR_WHATSAPP_ISAAC',
+    whatsapp: '593989656538', // +593 98 965 6538
     para: 'Planes, montos y cómo reservar tu cupo en la ronda.',
     acento: 'green',
   },
 ]
 
-/* 👇 REEMPLAZAR con el correo definitivo */
-export const EMAIL_CONTACTO = 'REEMPLAZAR_CORREO'
+export const EMAIL_CONTACTO = 'Despacho+1@haneiusa.com'
 
 export const ASUNTO_EMAIL = 'Interés en la ronda privada — Proyecto Starter Kits'
 
@@ -120,6 +115,45 @@ export function mensajeWhatsapp({ contacto, seccion, simulacion } = {}) {
   return lineas.join('\n')
 }
 
+/**
+ * Mensaje del flujo «Quiero participar»: el visitante ya armó su participación,
+ * así que el mensaje llega cerrado, con nombre, monto, plan y total.
+ *
+ * @param {object} opts
+ * @param {object} opts.contacto       uno de CONTACTOS
+ * @param {string} opts.nombre         nombre del interesado (puede ir vacío)
+ * @param {object} opts.participacion  { monto, plan, modalidad, tasa, retorno, total }
+ */
+export function mensajeParticipar({ contacto, nombre, participacion } = {}) {
+  const saludo = contacto?.corto ? `Hola ${contacto.corto},` : 'Hola,'
+  const quien = nombre?.trim() ? ` soy ${nombre.trim()}.` : ''
+
+  const { monto, plan, modalidad, tasa, retorno, total } = participacion ?? {}
+
+  return [
+    `${saludo}${quien}`,
+    '',
+    'Quiero participar en la ronda privada del Proyecto Starter Kits.',
+    '',
+    'Esta es mi participación:',
+    `• Monto a invertir: ${monto}`,
+    `• Plan: ${plan}`,
+    `• Modalidad: ${modalidad}`,
+    `• Ciclo: ${RONDA.mesesCiclo} meses (hasta el cierre)`,
+    `• Retorno objetivo: ${tasa} (${retorno})`,
+    `• Total a recibir al cierre: ${total}`,
+    '',
+    '¿Cómo seguimos para formalizar?',
+  ].join('\n')
+}
+
+/** Enlace de WhatsApp del flujo «Quiero participar». */
+export function waLinkParticipar(contacto, datos = {}) {
+  if (esPendiente(contacto?.whatsapp)) return null
+  const texto = mensajeParticipar({ contacto, ...datos })
+  return `https://wa.me/${contacto.whatsapp}?text=${encodeURIComponent(texto)}`
+}
+
 /** Enlace de WhatsApp listo para usar. Devuelve null si el número está pendiente. */
 export function waLink(contacto, contexto = {}) {
   if (esPendiente(contacto?.whatsapp)) return null
@@ -131,8 +165,10 @@ export function waLink(contacto, contexto = {}) {
 export function mailLink(contexto = {}) {
   if (esPendiente(EMAIL_CONTACTO)) return null
   const cuerpo = mensajeWhatsapp({ contacto: null, ...contexto })
+  /* El «+» del correo se codifica: algunos clientes lo interpretan como espacio. */
+  const destino = EMAIL_CONTACTO.replace(/\+/g, '%2B')
   return (
-    `mailto:${EMAIL_CONTACTO}` +
+    `mailto:${destino}` +
     `?subject=${encodeURIComponent(ASUNTO_EMAIL)}` +
     `&body=${encodeURIComponent(cuerpo)}`
   )
@@ -193,6 +229,37 @@ export const BIENVENIDA = {
     'aquí puede simular su participación antes de decidir.',
   ],
   cierre: 'Bienvenido a la presentación del Proyecto Starter Kits.',
+}
+
+/* ---------------------------------------------------------------------------
+ * Flujo «Quiero participar»
+ *
+ * El visitante arma su participación (nombre, monto, modalidad), ve el total
+ * proyectado al cierre del ciclo y la manda por WhatsApp ya escrita.
+ * -------------------------------------------------------------------------*/
+export const PARTICIPAR_MODAL = {
+  cta: 'Quiero participar',
+  titulo: 'Arma tu participación',
+  bajada:
+    'Elige tu monto y ve lo que recibirías al cierre del ciclo. Luego lo mandas por WhatsApp con un toque.',
+
+  campoNombre: '¿Cómo te llamas?',
+  placeholderNombre: 'Tu nombre y apellido',
+  ayudaNombre: 'Opcional, pero ayuda a que te respondan por tu nombre.',
+
+  campoMonto: '¿Cuánto quieres invertir?',
+  campoModalidad: '¿Cómo prefieres pagarlo?',
+
+  resultadoTitulo: (meses) => `Al cierre del ciclo (mes ${meses}) recibirías`,
+  resultadoPie: 'Capital + retorno, en un solo pago.',
+
+  aviso:
+    'Es un objetivo de gestión, no una garantía de rendimiento: el capital no está garantizado. Si retiras entre el mes 3 y el 6, el retorno es proporcional al tiempo transcurrido.',
+
+  enviarTitulo: 'Mándalo por WhatsApp',
+  enviarBajada: 'Escribe a quien prefieras: el mensaje va listo con tus datos.',
+
+  montoBajoMinimo: (minimo) => `El monto mínimo de la ronda es ${minimo}.`,
 }
 
 /* ---------------------------------------------------------------------------

@@ -4,7 +4,7 @@ import Bienvenida from './Bienvenida'
 import { HERO } from '../data/content'
 import { useCountUp } from '../hooks/useCountUp'
 
-export default function Hero() {
+export default function Hero({ onParticipar }) {
   const chipsRef = useRef(null)
   const chipsVisible = useInView(chipsRef, { once: true, amount: 0.4 })
 
@@ -64,16 +64,16 @@ export default function Hero() {
           transition={{ duration: 0.7, delay: 0.55 }}
           className="mt-11 flex flex-col gap-3 sm:flex-row sm:items-center"
         >
-          <a
-            href="#planes"
-            onClick={irA('planes')}
+          <button
+            type="button"
+            onClick={onParticipar}
             className="group inline-flex items-center justify-center gap-2 rounded-full bg-gold px-8 py-4 text-sm font-semibold text-navy-deep transition-all hover:brightness-110 hover:shadow-[0_14px_40px_-12px_rgba(201,162,39,0.9)]"
           >
-            Quiero invertir
+            Quiero participar
             <span className="transition-transform duration-300 group-hover:translate-x-1">
               →
             </span>
-          </a>
+          </button>
           <a
             href="#calculadora"
             onClick={irA('calculadora')}
