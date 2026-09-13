@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import Nav from './components/Nav'
 import Hero from './components/Hero'
 import BrandBar from './components/BrandBar'
@@ -31,6 +31,25 @@ export default function App() {
        un plan: solo entonces tiene sentido mandar la simulación por WhatsApp. */
     tocada: false,
   })
+
+  /* El resto de la página son ~25.000 px y unos sesenta componentes animados.
+     Construirlos en el mismo commit que el hero retrasa el primer pintado casi
+     medio segundo. Se difieren un frame: el visitante ve el hero enseguida y
+     lo demás llega antes de que pueda desplazarse. */
+  const [restoMontado, setRestoMontado] = useState(false)
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setRestoMontado(true))
+    return () => cancelAnimationFrame(id)
+  }, [])
+
+  /* Si se entra con un ancla (#planes), hay que repetir el salto una vez que
+     esa sección existe: al cargar todavía no estaba en el documento. */
+  useEffect(() => {
+    if (!restoMontado || !window.location.hash) return
+    const destino = document.getElementById(window.location.hash.slice(1))
+    destino?.scrollIntoView({ behavior: 'auto', block: 'start' })
+  }, [restoMontado])
 
   /* Flujo «Quiero participar»: se abre desde la nav, el hero y el CTA final. */
   const [participarAbierto, setParticiparAbierto] = useState(false)
@@ -68,29 +87,40 @@ export default function App() {
 
       <main>
         <Hero onParticipar={abrirParticipar} />
-        <BrandBar />
-        <Opportunity />
-        <HowItWorks />
-        <Plans onSimular={simular} />
-        <Calculator estado={calc} setEstado={setCalc} />
-        <WhyRealistic />
-        <Timeline />
-        <WinWin />
-        <Founder />
-        <RiskSection />
-        <CTA simulacion={simulacion} onParticipar={abrirParticipar} />
+
+        {restoMontado && (
+          <>
+            <BrandBar />
+            <Opportunity />
+            <HowItWorks />
+            <Plans onSimular={simular} />
+            <Calculator estado={calc} setEstado={setCalc} />
+            <WhyRealistic />
+            <Timeline />
+            <WinWin />
+            <Founder />
+            <RiskSection />
+            <CTA simulacion={simulacion} onParticipar={abrirParticipar} />
+          </>
+        )}
       </main>
 
-      <Footer />
+      {restoMontado && (
+        <>
+          <Footer />
 
-      <WhatsAppWidget simulacion={simulacion} onParticipar={abrirParticipar} />
+          <WhatsAppWidget simulacion={simulacion} onParticipar={abrirParticipar} />
 
-      <ModalParticipar
-        abierto={participarAbierto}
-        onCerrar={cerrarParticipar}
-        /* Arranca con lo que el visitante ya haya simulado en la calculadora */
-        inicial={calc.tocada ? { monto: calc.monto, modalidad: calc.modalidad } : null}
-      />
+          <ModalParticipar
+            abierto={participarAbierto}
+            onCerrar={cerrarParticipar}
+            /* Arranca con lo que ya se haya simulado en la calculadora */
+            inicial={
+              calc.tocada ? { monto: calc.monto, modalidad: calc.modalidad } : null
+            }
+          />
+        </>
+      )}
     </>
   )
 }

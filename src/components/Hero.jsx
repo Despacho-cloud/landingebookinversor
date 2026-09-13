@@ -20,32 +20,19 @@ export default function Hero({ onParticipar }) {
       <div className="container-page relative pb-20 pt-28 md:pb-28 md:pt-40">
         <Bienvenida />
 
-        <motion.p
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
-          className="eyebrow mt-7 text-gold"
-        >
-          {HERO.eyebrow}
-        </motion.p>
+        {/* El titular y su bajada se pintan de inmediato, sin animación de
+            entrada: son lo primero que debe leerse. Antes arrancaban en
+            opacity 0 y tardaban 0.75 s más en aparecer después de que React
+            montara, lo que se percibía como que el sitio seguía cargando. */}
+        <p className="eyebrow mt-7 text-gold">{HERO.eyebrow}</p>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 22 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.75, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-5 max-w-4xl text-[2.1rem] leading-[1.1] text-white sm:text-5xl md:text-[3.6rem]"
-        >
+        <h1 className="mt-5 max-w-4xl text-[2.1rem] leading-[1.1] text-white sm:text-5xl md:text-[3.6rem]">
           {HERO.title}
-        </motion.h1>
+        </h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-6 max-w-2xl text-base leading-relaxed text-white/65 md:text-lg"
-        >
+        <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/65 md:text-lg">
           {HERO.lead}
-        </motion.p>
+        </p>
 
         {/* Chips de datos clave */}
         <div
@@ -57,13 +44,8 @@ export default function Hero({ onParticipar }) {
           ))}
         </div>
 
-        {/* CTAs */}
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.55 }}
-          className="mt-11 flex flex-col gap-3 sm:flex-row sm:items-center"
-        >
+        {/* CTAs — visibles desde el primer frame, sin espera */}
+        <div className="mt-11 flex flex-col gap-3 sm:flex-row sm:items-center">
           <button
             type="button"
             onClick={onParticipar}
@@ -81,16 +63,11 @@ export default function Hero({ onParticipar }) {
           >
             Calcular mi retorno
           </a>
-        </motion.div>
+        </div>
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-          className="mt-8 max-w-2xl text-xs leading-relaxed text-white/40"
-        >
+        <p className="mt-8 max-w-2xl text-xs leading-relaxed text-white/40">
           {HERO.nota}
-        </motion.p>
+        </p>
       </div>
     </section>
   )
