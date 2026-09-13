@@ -71,34 +71,23 @@ dominio como dentro de un subdirectorio.
 
 ## Qué editar y dónde
 
-### ⚠️ Datos de contacto — lo primero que hay que completar
+### Datos de contacto
 
-Están todos juntos al inicio de `src/data/content.js`. Hay **tres** valores pendientes:
-
-```js
-export const CONTACTOS = [
-  { id: 'benjamin', ..., whatsapp: 'REEMPLAZAR_WHATSAPP_BENJAMIN' },
-  { id: 'isaac',    ..., whatsapp: 'REEMPLAZAR_WHATSAPP_ISAAC' },
-]
-
-export const EMAIL_CONTACTO = 'REEMPLAZAR_CORREO'
-```
+Están todos juntos al inicio de `src/data/content.js`, en `CONTACTOS` y
+`EMAIL_CONTACTO`. De ahí salen el botón flotante, el flujo «Quiero participar», los
+botones del CTA final y los enlaces del footer.
 
 **Formato del WhatsApp:** internacional, solo dígitos, sin `+`, sin espacios y sin
 guiones.
 
 | Número real | Se escribe |
 |---|---|
-| Ecuador `099 123 4567` | `'593991234567'` (593 + número sin el 0 inicial) |
+| Ecuador `+593 99 252 6667` | `'593992526667'` (593 + número sin el 0 inicial) |
 | EE. UU. `(305) 555-1234` | `'13055551234'` |
 
-Mientras un valor siga diciendo `REEMPLAZAR…`, el sitio **no genera el enlace**: el
-botón aparece desactivado con la nota «Número pendiente de configurar». Así nadie
-termina en un chat inexistente. En cuanto pones el número real, todos los botones se
-activan solos — no hay que tocar nada más.
-
-De estos tres valores salen: el botón flotante, los botones del CTA final y los
-enlaces del footer.
+Si algún valor se deja vacío o empezando por `REEMPLAZAR`, el sitio **no genera el
+enlace**: el botón queda desactivado con la nota «Número pendiente de configurar», en
+vez de llevar a un chat inexistente.
 
 ### Mensajes de WhatsApp: se arman solos
 
@@ -121,6 +110,46 @@ Quiero conversar sobre cómo entrar a la ronda con estas condiciones.
 
 Si todavía no simuló nada, el mensaje toma el ángulo de la sección donde está (planes,
 riesgo, reglas…). Esos textos se editan en `ANGULO_POR_SECCION`, en el mismo archivo.
+
+### El flujo «Quiero participar»
+
+Es el camino principal de conversión. El botón aparece en la navegación, el hero, el
+CTA final y el widget flotante, y abre una sola pantalla donde el interesado:
+
+1. pone su nombre (opcional),
+2. elige el monto — atajos por plan, slider y campo numérico,
+3. elige la modalidad de pago,
+4. ve en vivo el plan detectado, el retorno objetivo y **el total que recibiría al
+   cierre del ciclo**,
+5. lo manda por WhatsApp a Benjamín o a Isaac, ya escrito:
+
+```
+Hola Benjamín, soy Juan Pérez Molina.
+
+Quiero participar en la ronda privada del Proyecto Starter Kits.
+
+Esta es mi participación:
+• Monto a invertir: $1,200
+• Plan: Plan Ancla
+• Modalidad: Pago en 2 cuotas
+• Ciclo: 6 meses (hasta el cierre)
+• Retorno objetivo: 13% ($156.00)
+• Total a recibir al cierre: $1,356.00
+
+¿Cómo seguimos para formalizar?
+```
+
+Si ya venía jugando con la calculadora, el flujo arranca con ese monto y esa
+modalidad en vez de los valores por defecto.
+
+**Adaptación por dispositivo:** en móvil es una hoja que sube desde abajo, a ancho
+completo, con los botones de envío fijos al pie (al alcance del pulgar) y respetando
+el área segura del iPhone. Desde tablet en adelante es un diálogo centrado de 512 px.
+En los tres casos el contenido hace scroll dentro del diálogo, el fondo queda
+bloqueado, se cierra con Escape o tocando fuera, y el tabulador no se escapa.
+
+Los textos del flujo se editan en `PARTICIPAR_MODAL`, y el mensaje en
+`mensajeParticipar()`.
 
 ### Textos y cifras
 
@@ -164,6 +193,7 @@ src/
     Nav.jsx              Navegación fija + menú móvil + barra de progreso
     Hero.jsx             Portada, chips de datos clave, fondo animado
     Bienvenida.jsx       Saludo según la hora + frases con efecto de tecleo
+    ModalParticipar.jsx  Flujo «Quiero participar» (hoja móvil / diálogo desktop)
     WhatsAppWidget.jsx   Botón flotante con los dos contactos
     WhatsAppIcon.jsx     Glifo de WhatsApp (SVG inline)
     BrandBar.jsx         Barra de logos (variantes hero y footer)
