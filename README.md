@@ -249,13 +249,24 @@ compara `scrollY` contra posiciones medidas una vez, en vez de llamar a
 **4. Las imágenes están dimensionadas para su tamaño real de presentación** y llevan
 `width`/`height` para que la página no salte al cargarlas.
 
-Resultado medido en el build de producción:
+**5. El HTML trae un arranque pintado.** `index.html` incluye CSS crítico en línea y
+un `#arranque` con el azul de la marca. Sin eso, el segundo que tarda el JS en bajar y
+montar React es una pantalla en blanco. React sustituye ese arranque al montarse.
+
+**6. Solo el hero se monta en el primer commit de React.** El resto (~25.000 px y unos
+sesenta componentes animados) entra un frame después, en `App.jsx`. También por eso el
+titular del hero ya no lleva animación de entrada: arrancaba en `opacity: 0` y tardaba
+otros 0.75 s en aparecer.
+
+Medido sobre el despliegue real en Vercel:
 
 | | Antes | Después |
 |---|---|---|
-| Peticiones a terceros | 3 | 0 |
-| Peso total | ~490 KB | ~256 KB |
-| Scroll, primera pasada | 50 fps · 23 frames largos | 59 fps · 2 frames largos |
+| Peticiones a terceros | 3 | **0** |
+| Primer pintado (contenido) | 1416 ms | **364 ms** |
+| Primera visita (HTML+CSS+JS+fuentes) | — | **208 KB** con brotli |
+| Imágenes | 375 KB | **147 KB** |
+| Scroll de toda la página | 50 fps · 23 frames largos | **60 fps · 2 frames largos** |
 
 ## Stack
 
