@@ -1,0 +1,24 @@
+{
+  "name": "starter-kits-inversionistas",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Landing de ronda privada de inversión — Proyecto Starter Kits (HAN'EI Academy / MyEB2.life)",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "node scripts/check-finance.mjs"
+  },
+  "dependencies": {
+    "framer-motion": "^11.18.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.11",
+    "@vitejs/plugin-react": "^4.3.4",
+    "tailwindcss": "^4.1.11",
+    "vite": "^6.0.11"
+  }
+}
