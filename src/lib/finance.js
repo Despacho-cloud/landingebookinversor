@@ -15,13 +15,38 @@ export function planPorMonto(monto) {
 }
 
 /**
+ * Tramo del Plan Operador que corresponde a un monto.
+ * Por debajo del mínimo ($800) el rol no aplica y devuelve null.
+ */
+export function tramoOperador(monto) {
+  if (monto < PLAN_OPERADOR.montoMinimo) return null
+  let match = PLAN_OPERADOR.tramos[0]
+  for (const t of PLAN_OPERADOR.tramos) {
+    if (monto >= t.desde) match = t
+  }
+  return match
+}
+
+/**
  * Devuelve el plan efectivo considerando el toggle de Plan Operador.
- * El Operador comparte monto y retorno con el Plan Ancla: cambia el rol,
- * no el capital ni el porcentaje.
+ *
+ * El Operador no es un plan de la tabla sino un rol: paga un punto por encima
+ * del plan de capital equivalente, y solo desde $800. Si el monto no llega al
+ * mínimo, se cae al plan de capital normal.
  */
 export function planEfectivo(monto, esOperador) {
-  if (esOperador) return PLAN_OPERADOR
-  return planPorMonto(monto)
+  if (!esOperador) return planPorMonto(monto)
+
+  const tramo = tramoOperador(monto)
+  if (!tramo) return planPorMonto(monto)
+
+  return {
+    ...PLAN_OPERADOR,
+    monto: tramo.desde,
+    unico: tramo.unico,
+    dosCuotas: tramo.dosCuotas,
+    tramo,
+  }
 }
 
 /**

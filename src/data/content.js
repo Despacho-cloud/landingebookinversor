@@ -128,7 +128,8 @@ export function mensajeParticipar({ contacto, nombre, participacion } = {}) {
   const saludo = contacto?.corto ? `Hola ${contacto.corto},` : 'Hola,'
   const quien = nombre?.trim() ? ` soy ${nombre.trim()}.` : ''
 
-  const { monto, plan, modalidad, tasa, retorno, total } = participacion ?? {}
+  const { monto, plan, modalidad, tasa, retorno, total, esOperador } =
+    participacion ?? {}
 
   return [
     `${saludo}${quien}`,
@@ -138,6 +139,9 @@ export function mensajeParticipar({ contacto, nombre, participacion } = {}) {
     'Esta es mi participación:',
     `• Monto a invertir: ${monto}`,
     `• Plan: ${plan}`,
+    ...(esOperador
+      ? ['• Rol: operador (aporto capital y trabajo; presento ante las juntas)']
+      : []),
     `• Modalidad: ${modalidad}`,
     `• Ciclo: ${RONDA.mesesCiclo} meses (hasta el cierre)`,
     `• Retorno objetivo: ${tasa} (${retorno})`,
@@ -414,15 +418,52 @@ export const PLANES = [
   },
 ]
 
+/* ---------------------------------------------------------------------------
+ * Plan Operador
+ *
+ * No es un plan más de la tabla: es un rol. Quien entra como operador aporta
+ * capital Y trabajo (ideas, presencia en video, insumos creativos, y voz en
+ * las juntas del proyecto). Ese trabajo se reconoce con un punto porcentual
+ * por encima del plan de capital equivalente.
+ *
+ * Entrada mínima $800 — por debajo de ese monto el rol no aplica.
+ *
+ *   $800 – $1,199  →  13% pago único · 12% en 2 cuotas
+ *   $1,200 o más   →  15% pago único · 14% en 2 cuotas
+ *
+ * (Es el retorno del plan base más un punto: Crecimiento 12/11 → 13/12;
+ *  Ancla 14/13 → 15/14. Se mantiene la proporción de ~92% entre modalidades.)
+ * -------------------------------------------------------------------------*/
 export const PLAN_OPERADOR = {
   id: 'operador',
   nombre: 'Plan Operador',
-  monto: 1200,
-  unico: 14,
-  dosCuotas: 13,
+  montoMinimo: 800,
+
+  tramos: [
+    { desde: 800, hasta: 1199, unico: 13, dosCuotas: 12, base: 'Plan Crecimiento' },
+    { desde: 1200, hasta: null, unico: 15, dosCuotas: 14, base: 'Plan Ancla' },
+  ],
+
   titulo: '¿Quieres involucrarte más?',
-  body: 'Mismo monto y retorno objetivo del Plan Ancla ($1,200 · 14%), para quien además aporta ideas, presencia en video u otro insumo creativo para las campañas.',
-  nota: 'La parte de capital y la de colaboración se separan con claridad en el contrato privado, con revisión legal antes de firmar. Su diferencia frente al Plan Ancla es el rol, no el capital.',
+  body: 'Para quien además de capital aporta ideas, presencia en video e insumos creativos para las campañas. El rol se reconoce con un punto porcentual por encima del plan de capital equivalente.',
+
+  /* Lo que distingue al operador más allá del porcentaje */
+  beneficios: [
+    {
+      title: 'Un punto más de retorno objetivo',
+      body: 'Sobre el plan de capital que le corresponda a su monto, por el trabajo que aporta además del dinero.',
+    },
+    {
+      title: 'Voz en las juntas del proyecto',
+      body: 'Puede presentar el proyecto ante las distintas juntas que forman parte de Starter Kits. No es solo un inversionista: es parte de la operación.',
+    },
+    {
+      title: 'Protagonismo real',
+      body: 'Participa en las decisiones creativas y comerciales que impulsan la línea de productos, con un papel visible dentro del proyecto.',
+    },
+  ],
+
+  nota: 'La parte de capital y la de colaboración se separan con claridad en el contrato privado, con revisión legal antes de firmar. El punto adicional retribuye la colaboración, no el capital.',
 }
 
 export const PLANES_INTRO = {

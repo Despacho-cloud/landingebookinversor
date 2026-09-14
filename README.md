@@ -194,6 +194,7 @@ src/
     Hero.jsx             Portada, chips de datos clave, fondo animado
     Bienvenida.jsx       Saludo según la hora + frases con efecto de tecleo
     ModalParticipar.jsx  Flujo «Quiero participar» (hoja móvil / diálogo desktop)
+    BandaCTA.jsx         Banda «Quiero participar» intercalada entre secciones
     WhatsAppWidget.jsx   Botón flotante con los dos contactos
     WhatsAppIcon.jsx     Glifo de WhatsApp (SVG inline)
     BrandBar.jsx         Barra de logos (variantes hero y footer)
@@ -215,11 +216,62 @@ scripts/
   check-finance.mjs      Verifica la calculadora contra las cifras del PPTX
 ```
 
+## El Plan Operador
+
+No es un plan más de la tabla: es un **rol**. Quien entra como operador aporta capital
+*y* trabajo, y eso se retribuye con **un punto porcentual** por encima del plan de
+capital que le tocaría por su monto.
+
+| Monto | Pago único | En 2 cuotas | Plan de capital equivalente |
+|---|---|---|---|
+| $800 – $1,199 | **13%** | **12%** | Crecimiento (12% / 11%) |
+| $1,200 o más | **15%** | **14%** | Ancla (14% / 13%) |
+
+Entrada mínima **$800**: por debajo de ese monto el rol no aplica y la calculadora
+vuelve al plan de capital normal.
+
+Además del punto, el operador presenta el proyecto ante las distintas juntas que forman
+parte de Starter Kits y participa en las decisiones creativas y comerciales. Es parte de
+la operación, no solo un inversionista.
+
+> **Ojo con la coherencia:** el rango que se anuncia en portada (**9%–14%**) sigue
+> siendo el de los planes de capital. El 15% del operador **no** entra en ese rango a
+> propósito: ese punto extra retribuye el trabajo, no el dinero, y así está redactado en
+> el sitio. Si algún día se decide anunciar «9%–15%», hay que revisar también el
+> equivalente anualizado de la sección «Por qué el retorno es realista».
+>
+> La presentación `Starter_Kits_Presentacion_Inversionistas.pptx` todavía describe el
+> Plan Operador como «mismo monto y retorno del Plan Ancla ($1,200 · 14%)». **Esa
+> diapositiva quedó desactualizada** y conviene corregirla para que el deck y el sitio
+> digan lo mismo.
+
+Todo esto vive en `PLAN_OPERADOR` (`src/data/content.js`) y en `tramoOperador()` /
+`planEfectivo()` (`src/lib/finance.js`). Los tramos están cubiertos por `npm run check`.
+
+## Dónde puede pulsar el visitante
+
+El flujo «Quiero participar» se abre desde **ocho** puntos, colocados en los momentos
+en que alguien puede decidirse:
+
+| Dónde | Por qué ahí |
+|---|---|
+| Navegación fija | Siempre visible |
+| Hero | Primera impresión |
+| Tras los planes | Acaba de comparar |
+| Tras la calculadora | Acaba de ver su número — el de más intención |
+| Tras el modelo gana-gana | Acaba de entender el trato |
+| Tras la sección de riesgo | Leyó la parte incómoda y sigue ahí |
+| CTA final | Cierre natural |
+| Botón flotante de WhatsApp | Permanente, en cualquier punto del scroll |
+
+Las bandas intermedias son el componente `BandaCTA`, con un texto distinto en cada
+ubicación acorde al argumento que acaba de leerse.
+
 ## Cómo funciona la calculadora
 
 - El plan se detecta por el monto: `$300 → Inicial`, `$600 → Crecimiento`,
-  `$1,200+ → Ancla`. El toggle de operador aplica las condiciones del Plan Ancla y
-  sube el mínimo del control a $1,200.
+  `$1,200+ → Ancla`. El toggle de operador sube el mínimo del control a $800 y aplica
+  los tramos del rol (ver arriba).
 - El pago en 2 cuotas usa el retorno reducido de cada plan (≈92% del pago único).
 - El retorno es proporcional al tiempo: `retorno objetivo × mes de salida ÷ 6`.
   El mes de salida no puede bajar de 3 (bloqueo mínimo).

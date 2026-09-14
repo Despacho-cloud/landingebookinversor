@@ -93,13 +93,17 @@ export default function App() {
             <BrandBar />
             <Opportunity />
             <HowItWorks />
-            <Plans onSimular={simular} />
-            <Calculator estado={calc} setEstado={setCalc} />
+            <Plans onSimular={simular} onParticipar={abrirParticipar} />
+            <Calculator
+              estado={calc}
+              setEstado={setCalc}
+              onParticipar={abrirParticipar}
+            />
             <WhyRealistic />
             <Timeline />
-            <WinWin />
+            <WinWin onParticipar={abrirParticipar} />
             <Founder />
-            <RiskSection />
+            <RiskSection onParticipar={abrirParticipar} />
             <CTA simulacion={simulacion} onParticipar={abrirParticipar} />
           </>
         )}
@@ -116,7 +120,13 @@ export default function App() {
             onCerrar={cerrarParticipar}
             /* Arranca con lo que ya se haya simulado en la calculadora */
             inicial={
-              calc.tocada ? { monto: calc.monto, modalidad: calc.modalidad } : null
+              calc.tocada
+                ? {
+                    monto: calc.monto,
+                    modalidad: calc.modalidad,
+                    esOperador: calc.esOperador,
+                  }
+                : null
             }
           />
         </>

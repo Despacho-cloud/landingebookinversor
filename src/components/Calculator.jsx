@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion, useInView } from 'framer-motion'
 import Section from './Section'
 import Reveal from './Reveal'
+import BandaCTA from './BandaCTA'
 import { PLAN_OPERADOR, RONDA } from '../data/content'
 import { calcular, money, money2, pct, serieMensual } from '../lib/finance'
 import { useCountUp } from '../hooks/useCountUp'
@@ -10,7 +11,7 @@ const MIN = 300
 const MAX = 3000
 const PASO = 50
 
-export default function Calculator({ estado, setEstado }) {
+export default function Calculator({ estado, setEstado, onParticipar }) {
   const { monto, modalidad, mes, esOperador } = estado
   const [textoMonto, setTextoMonto] = useState(String(monto))
 
@@ -36,9 +37,9 @@ export default function Calculator({ estado, setEstado }) {
      botón de WhatsApp manda el resumen dentro del mensaje. */
   const set = (patch) => setEstado((s) => ({ ...s, ...patch, tocada: true }))
 
-  /* El Plan Operador exige el monto del Plan Ancla: mientras esté activo,
-     el mínimo del control sube a $1,200. */
-  const minMonto = esOperador ? PLAN_OPERADOR.monto : MIN
+  /* El rol de operador tiene entrada mínima propia: mientras esté activo, el
+     mínimo del control sube a $800. */
+  const minMonto = esOperador ? PLAN_OPERADOR.montoMinimo : MIN
 
   const aplicarTexto = () => {
     const n = Number(textoMonto.replace(/[^\d]/g, ''))
@@ -149,9 +150,9 @@ export default function Calculator({ estado, setEstado }) {
                     onChange={(e) =>
                       set({
                         esOperador: e.target.checked,
-                        // El Plan Operador exige el monto del Plan Ancla.
+                        // El rol de operador tiene entrada mínima propia.
                         monto: e.target.checked
-                          ? Math.max(monto, PLAN_OPERADOR.monto)
+                          ? Math.max(monto, PLAN_OPERADOR.montoMinimo)
                           : monto,
                       })
                     }
@@ -160,11 +161,18 @@ export default function Calculator({ estado, setEstado }) {
                   <span>
                     <span className="block text-sm font-medium text-white/85">
                       Quiero participar también como operador
+                      <span className="ml-2 rounded-full bg-gold/20 px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-wider text-gold">
+                        +1 punto
+                      </span>
                     </span>
                     <span className="mt-1 block text-xs leading-relaxed text-white/45">
-                      Aporto ideas, presencia en video o insumos creativos. Aplica las
-                      condiciones del Plan Ancla ($1,200 · 14%); la colaboración se
-                      formaliza aparte en el contrato.
+                      Aporto ideas, presencia en video e insumos creativos, y presento
+                      el proyecto ante las juntas. Desde $800:{' '}
+                      <strong className="font-semibold text-white/70">13%</strong> de $800
+                      a $1,199 y{' '}
+                      <strong className="font-semibold text-white/70">15%</strong> desde
+                      $1,200 (pago único). La colaboración se formaliza aparte en el
+                      contrato.
                     </span>
                   </span>
                 </label>
@@ -318,6 +326,14 @@ export default function Calculator({ estado, setEstado }) {
             </div>
           </div>
         </Reveal>
+
+        {/* El momento de mayor intención: acaba de ver su número */}
+        <BandaCTA
+          tone="dark"
+          onParticipar={onParticipar}
+          texto="¿Te cuadra el número?"
+          nota="Llévalo a WhatsApp con tu monto, tu plan y tu total ya escritos."
+        />
       </div>
     </Section>
   )

@@ -1,8 +1,9 @@
 import Section, { SectionHead } from './Section'
 import Reveal from './Reveal'
+import BandaCTA from './BandaCTA'
 import { GANA_GANA } from '../data/content'
 
-export default function WinWin() {
+export default function WinWin({ onParticipar }) {
   return (
     <Section id="gana-gana" tone="light">
       <SectionHead
@@ -21,6 +22,12 @@ export default function WinWin() {
           {GANA_GANA.claim}
         </p>
       </Reveal>
+
+      <BandaCTA
+        onParticipar={onParticipar}
+        texto="Si el modelo te encaja, el siguiente paso es simple."
+        nota="Eliges monto y modalidad, y nos escribes. Sin compromiso."
+      />
     </Section>
   )
 }

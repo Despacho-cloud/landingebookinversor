@@ -5,6 +5,7 @@ import {
   CONTACTOS,
   PARTICIPAR_MODAL as T,
   PLANES,
+  PLAN_OPERADOR,
   RONDA,
   waLinkParticipar,
 } from '../data/content'
@@ -27,6 +28,7 @@ export default function ModalParticipar({ abierto, onCerrar, inicial }) {
   const [monto, setMonto] = useState(inicial?.monto ?? 600)
   const [textoMonto, setTextoMonto] = useState(String(inicial?.monto ?? 600))
   const [modalidad, setModalidad] = useState(inicial?.modalidad ?? 'unico')
+  const [esOperador, setEsOperador] = useState(inicial?.esOperador ?? false)
 
   const cajaRef = useRef(null)
   const cierreRef = useRef(null)
@@ -40,7 +42,8 @@ export default function ModalParticipar({ abierto, onCerrar, inicial }) {
       setTextoMonto(String(inicial.monto))
     }
     if (inicial?.modalidad) setModalidad(inicial.modalidad)
-  }, [abierto, inicial?.monto, inicial?.modalidad])
+    if (inicial?.esOperador != null) setEsOperador(inicial.esOperador)
+  }, [abierto, inicial?.monto, inicial?.modalidad, inicial?.esOperador])
 
   /* Bloquea el scroll de fondo, cierra con Escape y devuelve el foco al salir. */
   useEffect(() => {
@@ -86,8 +89,8 @@ export default function ModalParticipar({ abierto, onCerrar, inicial }) {
   }, [abierto, onCerrar])
 
   const r = useMemo(
-    () => calcular({ monto, modalidad, mes: RONDA.mesesCiclo, esOperador: false }),
-    [monto, modalidad]
+    () => calcular({ monto, modalidad, mes: RONDA.mesesCiclo, esOperador }),
+    [monto, modalidad, esOperador]
   )
 
   const participacion = useMemo(
@@ -98,19 +101,32 @@ export default function ModalParticipar({ abierto, onCerrar, inicial }) {
       tasa: pct(r.tasa),
       retorno: money2(r.retorno),
       total: money2(r.total),
+      esOperador,
     }),
-    [monto, modalidad, r]
+    [monto, modalidad, r, esOperador]
   )
+
+  /* El rol de operador tiene entrada mínima propia ($800). */
+  const minMonto = esOperador ? PLAN_OPERADOR.montoMinimo : MIN
 
   const aplicarTexto = () => {
     const n = Number(textoMonto.replace(/[^\d]/g, ''))
-    const limpio = Number.isFinite(n) && n > 0 ? Math.min(Math.max(n, MIN), MAX) : MIN
+    const limpio =
+      Number.isFinite(n) && n > 0 ? Math.min(Math.max(n, minMonto), MAX) : minMonto
     const redondeado = Math.round(limpio / PASO) * PASO
     setMonto(redondeado)
     setTextoMonto(String(redondeado))
   }
 
-  const pctSlider = ((monto - MIN) / (MAX - MIN)) * 100
+  const alternarOperador = (activo) => {
+    setEsOperador(activo)
+    if (activo && monto < PLAN_OPERADOR.montoMinimo) {
+      setMonto(PLAN_OPERADOR.montoMinimo)
+      setTextoMonto(String(PLAN_OPERADOR.montoMinimo))
+    }
+  }
+
+  const pctSlider = ((monto - minMonto) / (MAX - minMonto)) * 100
 
   return (
     <AnimatePresence>
@@ -152,7 +168,9 @@ export default function ModalParticipar({ abierto, onCerrar, inicial }) {
               {/* Monto */}
               <Campo etiqueta={T.campoMonto} className="mt-7">
                 <div className="flex flex-wrap gap-2">
-                  {PLANES.map((p) => (
+                  {/* Con el rol de operador activo, los atajos por debajo de su
+                      entrada mínima no aplican. */}
+                  {PLANES.filter((p) => p.monto >= minMonto).map((p) => (
                     <button
                       key={p.id}
                       type="button"
@@ -169,6 +187,25 @@ export default function ModalParticipar({ abierto, onCerrar, inicial }) {
                       </span>
                     </button>
                   ))}
+
+                  {esOperador && (
+                    <button
+                      type="button"
+                      onClick={() => setMonto(PLAN_OPERADOR.montoMinimo)}
+                      className={`flex-1 rounded-xl px-3 py-2.5 text-center text-xs font-semibold transition-all ${
+                        monto === PLAN_OPERADOR.montoMinimo
+                          ? 'bg-gold text-navy-deep'
+                          : 'bg-white/[0.06] text-white/70 ring-1 ring-white/10 hover:bg-white/[0.1]'
+                      }`}
+                    >
+                      <span className="tnum block text-sm">
+                        {money(PLAN_OPERADOR.montoMinimo)}
+                      </span>
+                      <span className="mt-0.5 block text-[0.65rem] font-normal opacity-75">
+                        Operador
+                      </span>
+                    </button>
+                  )}
                 </div>
 
                 <div className="mt-4 flex items-center gap-3">
@@ -178,7 +215,7 @@ export default function ModalParticipar({ abierto, onCerrar, inicial }) {
                       type="number"
                       inputMode="numeric"
                       value={textoMonto}
-                      min={MIN}
+                      min={minMonto}
                       max={MAX}
                       step={PASO}
                       onChange={(e) => setTextoMonto(e.target.value)}
@@ -192,7 +229,7 @@ export default function ModalParticipar({ abierto, onCerrar, inicial }) {
                   <input
                     type="range"
                     className="range-gold flex-1"
-                    min={MIN}
+                    min={minMonto}
                     max={MAX}
                     step={PASO}
                     value={monto}
@@ -205,7 +242,7 @@ export default function ModalParticipar({ abierto, onCerrar, inicial }) {
                 </div>
 
                 <p className="tnum mt-1 flex justify-between text-[0.7rem] text-white/35">
-                  <span>mín. {money(MIN)}</span>
+                  <span>mín. {money(minMonto)}</span>
                   <span>{money(MAX)}</span>
                 </p>
               </Campo>
@@ -254,8 +291,31 @@ export default function ModalParticipar({ abierto, onCerrar, inicial }) {
                 </div>
               </Campo>
 
+              {/* Rol de operador */}
+              <label className="mt-7 flex cursor-pointer items-start gap-3 rounded-2xl border border-gold/30 bg-gold/[0.07] p-4 transition-colors hover:border-gold/55">
+                <input
+                  type="checkbox"
+                  checked={esOperador}
+                  onChange={(e) => alternarOperador(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-[#C9A227]"
+                />
+                <span>
+                  <span className="flex flex-wrap items-center gap-2 text-sm font-semibold text-white">
+                    Entrar como operador
+                    <span className="rounded-full bg-gold px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider text-navy-deep">
+                      +1 punto
+                    </span>
+                  </span>
+                  <span className="mt-1.5 block text-xs leading-relaxed text-white/55">
+                    Además de capital aportas ideas, presencia en video e insumos
+                    creativos, y presentas el proyecto ante las juntas. Desde{' '}
+                    {money(PLAN_OPERADOR.montoMinimo)}.
+                  </span>
+                </span>
+              </label>
+
               {/* Resultado */}
-              <Resultado resultado={r} monto={monto} />
+              <Resultado resultado={r} monto={monto} esOperador={esOperador} />
 
               <p className="mt-4 rounded-xl bg-white/[0.04] p-3.5 text-[0.7rem] leading-relaxed text-white/50">
                 {T.aviso}
@@ -347,7 +407,7 @@ function Campo({ etiqueta, ayuda, children, className = '' }) {
   )
 }
 
-function Resultado({ resultado, monto }) {
+function Resultado({ resultado, monto, esOperador }) {
   const total = useCountUp(resultado.total, { duration: 600 })
   const ganancia = useCountUp(resultado.retorno, { duration: 600 })
 
@@ -359,6 +419,11 @@ function Resultado({ resultado, monto }) {
           <span className="font-display text-base text-white">
             {resultado.plan?.nombre ?? 'Monto insuficiente'}
           </span>
+          {esOperador && resultado.plan?.id === 'operador' && (
+            <span className="rounded-full bg-white/15 px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider text-gold">
+              +1 pt
+            </span>
+          )}
           <span className="tnum rounded-full bg-gold px-2 py-0.5 text-[0.7rem] font-bold text-navy-deep">
             {pct(resultado.tasa)}
           </span>

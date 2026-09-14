@@ -1,8 +1,9 @@
 import Section, { SectionHead } from './Section'
 import Reveal, { RevealGroup, RevealItem } from './Reveal'
+import BandaCTA from './BandaCTA'
 import { RIESGO } from '../data/content'
 
-export default function RiskSection() {
+export default function RiskSection({ onParticipar }) {
   return (
     <Section id="riesgo" tone="dark">
       <SectionHead tone="dark" eyebrow={RIESGO.eyebrow} title={RIESGO.title} />
@@ -32,6 +33,13 @@ export default function RiskSection() {
           </RevealItem>
         ))}
       </RevealGroup>
+
+      <BandaCTA
+        tone="dark"
+        onParticipar={onParticipar}
+        texto="Leíste la parte incómoda y sigues aquí."
+        nota="Entonces hablemos de tu participación, con las condiciones claras desde el inicio."
+      />
     </Section>
   )
 }
