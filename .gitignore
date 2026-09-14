@@ -3,3 +3,7 @@ dist
 .DS_Store
 *.local
 .vite
+
+# El repositorio es publico: la presentacion para inversionistas no se versiona
+_deck/
+*.pptx
