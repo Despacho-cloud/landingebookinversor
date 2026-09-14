@@ -85,6 +85,29 @@ export function calcular({ monto, modalidad, mes, esOperador }) {
   }
 }
 
+/**
+ * Cuánto ganaría de más este mismo monto entrando como operador.
+ *
+ * Sirve para enseñar la ventaja en concreto —«13% en vez de 12%, son $8 más»—
+ * en lugar de dejarla enunciada. Devuelve null si el monto no llega al mínimo
+ * del rol o si ya se está calculando como operador.
+ */
+export function ventajaOperador({ monto, modalidad, mes = RONDA.mesesCiclo }) {
+  if (monto < PLAN_OPERADOR.montoMinimo) return null
+
+  const normal = calcular({ monto, modalidad, mes, esOperador: false })
+  const operador = calcular({ monto, modalidad, mes, esOperador: true })
+  const extra = operador.retorno - normal.retorno
+  if (extra <= 0) return null
+
+  return {
+    tasaNormal: normal.tasa,
+    tasaOperador: operador.tasa,
+    extra,
+    totalOperador: operador.total,
+  }
+}
+
 /** Serie mes 3 → 6 para el gráfico de evolución del retorno. */
 export function serieMensual({ monto, modalidad, esOperador }) {
   const meses = []

@@ -67,6 +67,18 @@ dominio como dentro de un subdirectorio.
 > documento privado dirigido a inversionistas invitados. Si en algún momento quieres que
 > el sitio se indexe en buscadores, elimina esa línea.
 
+### ⚠️ Este repositorio es público
+
+`Despacho-cloud/landingebookinversor` está en modo público, así que **cualquiera que dé
+con él puede leer todo el código fuente**: los números de WhatsApp de Benjamín e Isaac,
+el correo de contacto y todas las condiciones de la ronda. El `noindex` protege al sitio
+de los buscadores, pero no al repositorio.
+
+Por eso **la presentación para inversionistas no se versiona aquí**. Si quieres que deje
+de ser visible, cambia la visibilidad a privada en *Settings → General → Danger Zone →
+Change repository visibility*; Vercel sigue desplegando igual desde un repositorio
+privado.
+
 ---
 
 ## Qué editar y dónde
@@ -237,13 +249,17 @@ la operación, no solo un inversionista.
 > **Ojo con la coherencia:** el rango que se anuncia en portada (**9%–14%**) sigue
 > siendo el de los planes de capital. El 15% del operador **no** entra en ese rango a
 > propósito: ese punto extra retribuye el trabajo, no el dinero, y así está redactado en
-> el sitio. Si algún día se decide anunciar «9%–15%», hay que revisar también el
-> equivalente anualizado de la sección «Por qué el retorno es realista».
->
-> La presentación `Starter_Kits_Presentacion_Inversionistas.pptx` todavía describe el
-> Plan Operador como «mismo monto y retorno del Plan Ancla ($1,200 · 14%)». **Esa
-> diapositiva quedó desactualizada** y conviene corregirla para que el deck y el sitio
-> digan lo mismo.
+> el sitio y en el deck. Si algún día se decide anunciar «9%–15%», hay que revisar
+> también el equivalente anualizado de la sección «Por qué el retorno es realista».
+
+La presentación para inversionistas ya está alineada con esto: la lámina 8 remite al
+rol y **la lámina 9 está dedicada al Plan Operador**, con los dos tramos y los
+beneficios. El deck no vive en este repositorio (ver la nota de privacidad más abajo).
+
+La ventaja se muestra además **en concreto**: mientras el rol está desactivado, tanto la
+calculadora como el flujo «Quiero participar» calculan cuánto ganaría de más con el
+monto que el visitante ya tiene puesto — «Con $1,200 serían 15% en vez de 14% — $12.00
+más» — en lugar de dejarlo enunciado. Eso es `ventajaOperador()` en `src/lib/finance.js`.
 
 Todo esto vive en `PLAN_OPERADOR` (`src/data/content.js`) y en `tramoOperador()` /
 `planEfectivo()` (`src/lib/finance.js`). Los tramos están cubiertos por `npm run check`.

@@ -4,7 +4,14 @@ import Section from './Section'
 import Reveal from './Reveal'
 import BandaCTA from './BandaCTA'
 import { PLAN_OPERADOR, RONDA } from '../data/content'
-import { calcular, money, money2, pct, serieMensual } from '../lib/finance'
+import {
+  calcular,
+  money,
+  money2,
+  pct,
+  serieMensual,
+  ventajaOperador,
+} from '../lib/finance'
 import { useCountUp } from '../hooks/useCountUp'
 
 const MIN = 300
@@ -49,6 +56,12 @@ export default function Calculator({ estado, setEstado, onParticipar }) {
     set({ monto: redondeado })
     setTextoMonto(String(redondeado))
   }
+
+  /* Cuánto ganaría de más este mismo monto entrando como operador */
+  const ventaja = useMemo(
+    () => (esOperador ? null : ventajaOperador({ monto, modalidad, mes })),
+    [monto, modalidad, mes, esOperador]
+  )
 
   const pctSlider = ((monto - minMonto) / (MAX - minMonto)) * 100
   const pctMes = ((mes - RONDA.bloqueoMeses) / (RONDA.mesesCiclo - RONDA.bloqueoMeses)) * 100
@@ -174,6 +187,14 @@ export default function Calculator({ estado, setEstado, onParticipar }) {
                       $1,200 (pago único). La colaboración se formaliza aparte en el
                       contrato.
                     </span>
+
+                    {/* La ventaja en concreto, con el monto que ya tiene puesto */}
+                    {!esOperador && ventaja && (
+                      <span className="mt-2 block text-xs font-semibold text-gold">
+                        Con {money(monto)} serían {pct(ventaja.tasaOperador)} en vez de{' '}
+                        {pct(ventaja.tasaNormal)} — {money2(ventaja.extra)} más.
+                      </span>
+                    )}
                   </span>
                 </label>
               </div>

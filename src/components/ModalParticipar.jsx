@@ -9,7 +9,7 @@ import {
   RONDA,
   waLinkParticipar,
 } from '../data/content'
-import { calcular, money, money2, pct } from '../lib/finance'
+import { calcular, money, money2, pct, ventajaOperador } from '../lib/finance'
 import { useCountUp } from '../hooks/useCountUp'
 
 const MIN = PLANES[0].monto // $300
@@ -108,6 +108,12 @@ export default function ModalParticipar({ abierto, onCerrar, inicial }) {
 
   /* El rol de operador tiene entrada mínima propia ($800). */
   const minMonto = esOperador ? PLAN_OPERADOR.montoMinimo : MIN
+
+  /* Cuánto ganaría de más con este mismo monto si entrara como operador */
+  const ventaja = useMemo(
+    () => (esOperador ? null : ventajaOperador({ monto, modalidad })),
+    [monto, modalidad, esOperador]
+  )
 
   const aplicarTexto = () => {
     const n = Number(textoMonto.replace(/[^\d]/g, ''))
@@ -311,6 +317,14 @@ export default function ModalParticipar({ abierto, onCerrar, inicial }) {
                     creativos, y presentas el proyecto ante las juntas. Desde{' '}
                     {money(PLAN_OPERADOR.montoMinimo)}.
                   </span>
+
+                  {/* La ventaja, en concreto y con el monto que ya eligió */}
+                  {!esOperador && ventaja && (
+                    <span className="mt-2 block text-xs font-semibold text-gold">
+                      Con este monto serían {pct(ventaja.tasaOperador)} en vez de{' '}
+                      {pct(ventaja.tasaNormal)} — {money2(ventaja.extra)} más.
+                    </span>
+                  )}
                 </span>
               </label>
 
